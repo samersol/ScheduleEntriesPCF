@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<manifest>
+  <control namespace="pur" constructor="SchedulePlannerV5" version="0.0.1" display-name-key="Schedule Planner V5" description-key="Weekly/Monthly schedule planner" control-type="virtual">
+    <external-service-usage enabled="false">
+    </external-service-usage>
+
+    <!-- Input Properties -->
+    <property name="weekStartDate" display-name-key="Week Start Date" of-type="SingleLine.Text" usage="bound" required="true" />
+    <property name="viewMode" display-name-key="View Mode" of-type="SingleLine.Text" usage="bound" required="true" />
+
+    <!-- Output Properties -->
+    <property name="selectedAction" display-name-key="Selected Action" of-type="SingleLine.Text" usage="output" />
+    <property name="selectedEmployeeId" display-name-key="Selected Employee ID" of-type="SingleLine.Text" usage="output" />
+    <property name="selectedDate" display-name-key="Selected Date" of-type="SingleLine.Text" usage="output" />
+    <property name="copiedRecordIds" display-name-key="Copied Record IDs" of-type="SingleLine.Text" usage="output" />
+    <property name="pasteTargetEmployeeId" display-name-key="Paste Target Employee ID" of-type="SingleLine.Text" usage="output" />
+    <property name="pasteTargetDate" display-name-key="Paste Target Date" of-type="SingleLine.Text" usage="output" />
+
+    <!-- Datasets -->
+    <data-set name="employeeDataSet" display-name-key="Employees">
+      <property-set name="pur_fxemployeeid" display-name-key="Employee ID" of-type="SingleLine.Text" usage="bound" required="true" />
+      <property-set name="pur_fxfullname" display-name-key="Employee Name" of-type="SingleLine.Text" usage="bound" required="true" />
+      <property-set name="pur_stremployeenumber" display-name-key="Employee Number" of-type="SingleLine.Text" usage="bound" required="true" />
+      <property-set name="pur_dblweeklyworkhours" display-name-key="Weekly Hours" of-type="SingleLine.Text" usage="bound" required="true" />
+      <property-set name="pur_dtetrainingexpirydate" display-name-key="Training Expiry Date" of-type="SingleLine.Text" usage="bound" required="true" />
+      <property-set name="pur_dtedateofbirth" display-name-key="Date of Birth" of-type="SingleLine.Text" usage="bound" required="false" />
+    </data-set>
+
+    <data-set name="scheduleDataSet" display-name-key="Schedule Entries">
+      <property-set name="pur_fxscheduleentry" display-name-key="Entry ID" of-type="SingleLine.Text" usage="bound" required="true" />
+      <property-set name="pur_fxscheduleemployeeid" display-name-key="Employee ID" of-type="SingleLine.Text" usage="bound" required="true" />
+      <property-set name="pur_fxcostcentername" display-name-key="Cost Center" of-type="SingleLine.Text" usage="bound" required="true" />
+      <property-set name="pur_dtedatefrom" display-name-key="Date From" of-type="SingleLine.Text" usage="bound" required="true" />
+      <property-set name="pur_dtedateto" display-name-key="Date To" of-type="SingleLine.Text" usage="bound" required="true" />
+      <property-set name="pur_intpause" display-name-key="Pause" of-type="SingleLine.Text" usage="bound" required="true" />
+      <property-set name="pur_fxduration" display-name-key="Duration" of-type="SingleLine.Text" usage="bound" required="true" />
+      <property-set name="pur_strnote" display-name-key="Note" of-type="SingleLine.Text" usage="bound" required="false" />
+    </data-set>
+
+    <data-set name="absenceDataSet" display-name-key="Absences">
+      <property-set name="pur_fxabsenceentryid" display-name-key="Absence ID" of-type="SingleLine.Text" usage="bound" required="true" />
+      <property-set name="pur_fxabsenceemployeeid" display-name-key="Employee ID" of-type="SingleLine.Text" usage="bound" required="true" />
+      <property-set name="pur_fxabsencetype" display-name-key="Absence Type" of-type="SingleLine.Text" usage="bound" required="true" />
+      <property-set name="pur_dtedatestart" display-name-key="Start Date" of-type="SingleLine.Text" usage="bound" required="true" />
+      <property-set name="pur_dtedateend" display-name-key="End Date" of-type="SingleLine.Text" usage="bound" required="true" />
+    </data-set>
+
+    <resources>
+      <code path="index.ts" order="1" />
+      <platform-library name="React" version="16.14.0" />
+    </resources>
+  </control>
+</manifest>
