@@ -2,6 +2,7 @@ export interface Employee {
     employeeId: string;
     employeeName: string;
     employeeNumber: string;
+    note: string;
     weeklyHours: number;
     actualHours: number;
     targetHours: number;
@@ -13,6 +14,9 @@ export interface Employee {
 export interface ScheduleEntry {
     scheduleEntryId: string;
     employeeId: string;
+    customerName: string;
+    fullAddress: string;
+    costCenterNumber: string;
     costCenterName: string;
     dateFrom: Date | null;
     dateTo: Date | null;

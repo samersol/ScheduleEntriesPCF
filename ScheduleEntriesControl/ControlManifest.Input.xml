@@ -24,11 +24,15 @@
       <property-set name="pur_dblweeklyworkhours" display-name-key="Weekly Hours" of-type="SingleLine.Text" usage="bound" required="true" />
       <property-set name="pur_dtetrainingexpirydate" display-name-key="Training Expiry Date" of-type="SingleLine.Text" usage="bound" required="true" />
       <property-set name="pur_dtedateofbirth" display-name-key="Date of Birth" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="pur_fxemployeenote" display-name-key="Employee Note" of-type="SingleLine.Text" usage="bound" required="false" />
     </data-set>
 
     <data-set name="scheduleDataSet" display-name-key="Schedule Entries">
       <property-set name="pur_fxscheduleentry" display-name-key="Entry ID" of-type="SingleLine.Text" usage="bound" required="true" />
       <property-set name="pur_fxscheduleemployeeid" display-name-key="Employee ID" of-type="SingleLine.Text" usage="bound" required="true" />
+      <property-set name="pur_fxcustomername" display-name-key="Customer Name" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="pur_fxfulladdress" display-name-key="Full Address" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="pur_fxcostcenternumber" display-name-key="Cost Center Number" of-type="SingleLine.Text" usage="bound" required="false" />
       <property-set name="pur_fxcostcentername" display-name-key="Cost Center" of-type="SingleLine.Text" usage="bound" required="true" />
       <property-set name="pur_dtedatefrom" display-name-key="Date From" of-type="SingleLine.Text" usage="bound" required="true" />
       <property-set name="pur_dtedateto" display-name-key="Date To" of-type="SingleLine.Text" usage="bound" required="true" />

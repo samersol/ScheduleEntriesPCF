@@ -151,6 +151,8 @@ export const EmployeeRow: React.FC<EmployeeRowProps> = ({
     const getAbsencesForDay = (dateStr: string): AbsenceEntry[] =>
         absencesForEmployee.filter(a => isDateInRange(dateStr, a.dateStart, a.dateEnd));
 
+    const employeeNote = employee.note?.trim();
+
     return (
         <React.Fragment>
             {/* Employee info cell */}
@@ -216,6 +218,19 @@ export const EmployeeRow: React.FC<EmployeeRowProps> = ({
                     <span style={{ fontSize: '12px', color: '#9CA3AF' }}>
                         {employee.employeeNumber}
                     </span>
+                    {employeeNote && (
+                        <span
+                            style={{
+                                fontSize: '11px',
+                                color: '#6B7280',
+                                lineHeight: 1.35,
+                                fontStyle: 'italic',
+                                marginTop: '2px',
+                            }}
+                        >
+                            {employeeNote}
+                        </span>
+                    )}
                 </div>
             </div>
 
