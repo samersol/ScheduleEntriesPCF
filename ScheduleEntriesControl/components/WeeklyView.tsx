@@ -17,6 +17,7 @@ interface WeeklyViewProps {
     onFilled: (employeeId: string, date: string) => void;
     onCopy: (employeeId: string, date: string, entries: ScheduleEntry[]) => void;
     onPaste: (employeeId: string, date: string) => void;
+    pasteWarning: string;
     width?: number;
     height?: number;
 }
@@ -70,6 +71,7 @@ export const WeeklyView: React.FC<WeeklyViewProps> = ({
     onFilled,
     onCopy,
     onPaste,
+    pasteWarning,
     width,
     height,
 }) => {
@@ -96,10 +98,33 @@ export const WeeklyView: React.FC<WeeklyViewProps> = ({
                 display: 'flex',
                 flexDirection: 'column',
                 overflow: 'hidden',
+                position: 'relative',
             }}
         >
             {copyState.active && (
                 <CopyBanner copyState={copyState} onCancel={onCancelCopy} />
+            )}
+
+            {pasteWarning && (
+                <div
+                    style={{
+                        position: 'absolute',
+                        top: copyState.active ? '56px' : '16px',
+                        right: '16px',
+                        maxWidth: '420px',
+                        background: '#FEF2F2',
+                        color: '#991B1B',
+                        border: '1px solid #FECACA',
+                        borderRadius: '10px',
+                        padding: '10px 14px',
+                        boxShadow: '0 8px 20px rgba(0,0,0,0.12)',
+                        zIndex: 20,
+                        fontSize: '13px',
+                        lineHeight: 1.4,
+                    }}
+                >
+                    {pasteWarning}
+                </div>
             )}
 
             <div

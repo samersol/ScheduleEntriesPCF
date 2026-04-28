@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { IInputs, IOutputs } from '../generated/ManifestTypes';
 import { parseEmployees, parseScheduleEntries, parseAbsences } from '../hooks/useDatasets';
 import { useCopyPaste } from '../hooks/useCopyPaste';
 import { ScheduleEntry } from '../types';
-import { normalizeDateToISO } from '../utils/dateUtils';
+import { formatDateISO, normalizeDateToISO } from '../utils/dateUtils';
 import { WeeklyView } from './WeeklyView';
 import { MonthlyView } from './MonthlyView';
 
@@ -29,8 +29,51 @@ function isValidISODate(dateStr: string): boolean {
     return !isNaN(d.getTime());
 }
 
+function toMinutes(date: Date | null): number | null {
+    if (!date) return null;
+    return date.getHours() * 60 + date.getMinutes();
+}
+
+function hasPasteOverlap(
+    scheduleEntries: ScheduleEntry[],
+    copiedRecordIds: string[],
+    targetEmployeeId: string,
+    targetDate: string,
+): boolean {
+    if (copiedRecordIds.length === 0) return false;
+
+    const copiedEntries = scheduleEntries.filter(entry => copiedRecordIds.includes(entry.scheduleEntryId));
+    const targetEntries = scheduleEntries.filter(
+        entry =>
+            entry.employeeId === targetEmployeeId &&
+            entry.dateFrom &&
+            formatDateISO(entry.dateFrom) === targetDate,
+    );
+
+    return copiedEntries.some(copiedEntry => {
+        const copiedStart = toMinutes(copiedEntry.dateFrom);
+        const copiedEnd = toMinutes(copiedEntry.dateTo);
+
+        if (copiedStart === null || copiedEnd === null) {
+            return false;
+        }
+
+        return targetEntries.some(targetEntry => {
+            const targetStart = toMinutes(targetEntry.dateFrom);
+            const targetEnd = toMinutes(targetEntry.dateTo);
+
+            if (targetStart === null || targetEnd === null) {
+                return false;
+            }
+
+            return copiedStart < targetEnd && targetStart < copiedEnd;
+        });
+    });
+}
+
 export const App: React.FC<IAppProps> = ({ context, onOutputChanged, width, height }) => {
     const { copyState, startCopy, cancelCopy } = useCopyPaste();
+    const [pasteWarning, setPasteWarning] = useState('');
 
     const lastValidDate = useRef<string>(getCurrentMonday());
 
@@ -77,7 +120,31 @@ export const App: React.FC<IAppProps> = ({ context, onOutputChanged, width, heig
         });
     };
 
+    useEffect(() => {
+        if (!pasteWarning) return;
+
+        const timeoutId = window.setTimeout(() => setPasteWarning(''), 3200);
+        return () => window.clearTimeout(timeoutId);
+    }, [pasteWarning]);
+
     const handlePaste = (targetEmployeeId: string, targetDate: string) => {
+        const overlapDetected = hasPasteOverlap(
+            scheduleEntries,
+            copyState.recordIds,
+            targetEmployeeId,
+            targetDate,
+        );
+
+        if (overlapDetected) {
+            setPasteWarning('⚠ Einfügen nicht möglich: Mindestens ein kopierter Dienst überlappt mit einem bestehenden Dienst.');
+            onOutputChanged({
+                selectedAction: 'cancel',
+                selectedEmployeeId: targetEmployeeId,
+                selectedDate: targetDate,
+            });
+            return;
+        }
+
         onOutputChanged({
             selectedAction: 'paste',
             pasteTargetEmployeeId: targetEmployeeId,
@@ -111,6 +178,7 @@ export const App: React.FC<IAppProps> = ({ context, onOutputChanged, width, heig
             onFilled={handleFilled}
             onCopy={handleCopy}
             onPaste={handlePaste}
+            pasteWarning={pasteWarning}
             width={width}
             height={height}
         />

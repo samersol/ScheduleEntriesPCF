@@ -4,7 +4,7 @@ import * as React from 'react';
 
 const MAX_PAGE_SIZE = 5000;
 
-export class SchedulePlannerV5 implements ComponentFramework.ReactControl<IInputs, IOutputs> {
+export class SchedulePlannerV6 implements ComponentFramework.ReactControl<IInputs, IOutputs> {
     private notifyOutputChanged: () => void;
     private outputValues: IOutputs = {};
     private pageSizeSet = false;
