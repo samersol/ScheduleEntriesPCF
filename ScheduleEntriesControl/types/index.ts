@@ -3,6 +3,7 @@ export interface Employee {
     employeeName: string;
     employeeNumber: string;
     note: string;
+    customers: string;
     weeklyHours: number;
     actualHours: number;
     targetHours: number;

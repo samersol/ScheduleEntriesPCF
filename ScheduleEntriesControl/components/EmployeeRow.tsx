@@ -146,12 +146,15 @@ export const EmployeeRow: React.FC<EmployeeRowProps> = ({
         : '';
 
     const getEntriesForDay = (dateStr: string): ScheduleEntry[] =>
-        entriesForEmployee.filter(e => e.dateFrom && formatDateISO(e.dateFrom) === dateStr);
+        entriesForEmployee
+            .filter(e => e.dateFrom && formatDateISO(e.dateFrom) === dateStr)
+            .sort((a, b) => (a.dateFrom?.getTime() ?? 0) - (b.dateFrom?.getTime() ?? 0));
 
     const getAbsencesForDay = (dateStr: string): AbsenceEntry[] =>
         absencesForEmployee.filter(a => isDateInRange(dateStr, a.dateStart, a.dateEnd));
 
     const employeeNote = employee.note?.trim();
+    const customersLine = employee.customers?.trim();
 
     return (
         <React.Fragment>
@@ -229,6 +232,18 @@ export const EmployeeRow: React.FC<EmployeeRowProps> = ({
                             }}
                         >
                             {employeeNote}
+                        </span>
+                    )}
+                    {customersLine && (
+                        <span
+                            style={{
+                                fontSize: '11px',
+                                color: '#6B7280',
+                                lineHeight: 1.35,
+                                marginTop: '2px',
+                            }}
+                        >
+                            {customersLine}
                         </span>
                     )}
                 </div>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <manifest>
-  <control namespace="pur" constructor="SchedulePlannerV6" version="0.0.1" display-name-key="Schedule Planner V6" description-key="Weekly/Monthly schedule planner" control-type="virtual">
+  <control namespace="pur" constructor="SchedulePlannerV6" version="0.0.2" display-name-key="Schedule Planner V6" description-key="Weekly/Monthly schedule planner" control-type="virtual">
     <external-service-usage enabled="false">
     </external-service-usage>
 
@@ -25,6 +25,7 @@
       <property-set name="pur_dtetrainingexpirydate" display-name-key="Training Expiry Date" of-type="SingleLine.Text" usage="bound" required="true" />
       <property-set name="pur_dtedateofbirth" display-name-key="Date of Birth" of-type="SingleLine.Text" usage="bound" required="false" />
       <property-set name="pur_fxemployeenote" display-name-key="Employee Note" of-type="SingleLine.Text" usage="bound" required="false" />
+      <property-set name="pur_strcustomers" display-name-key="Customers" of-type="SingleLine.Text" usage="bound" required="false" />
     </data-set>
 
     <data-set name="scheduleDataSet" display-name-key="Schedule Entries">
