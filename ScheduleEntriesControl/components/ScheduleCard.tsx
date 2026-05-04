@@ -9,8 +9,11 @@ interface ScheduleCardProps {
 export const ScheduleCard: React.FC<ScheduleCardProps> = ({ entry }) => {
     const startTime = formatTime(entry.dateFrom);
     const endTime = formatTime(entry.dateTo);
-    const durationStr = entry.duration % 1 === 0 ? `${entry.duration}` : entry.duration.toFixed(1);
-    const timeStr = `${startTime}\u2013${endTime} \u00B7 ${durationStr}h`;
+    const durationStr =
+        entry.duration % 1 === 0
+            ? `${entry.duration}h`
+            : ` ${Math.floor(entry.duration)} h ${(entry.duration % 1) * 60} min`;
+    const timeStr = `${startTime}\u2013${endTime} \u00B7 ${durationStr}`;
 
     const customerLine = entry.customerName || entry.costCenterName;
     const addressLine = entry.fullAddress;

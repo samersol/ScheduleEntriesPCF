@@ -44,7 +44,7 @@ export function formatDateDE(dateStr: string): string {
 }
 
 export function getWeekDays(weekStartDate: string): string[] {
-    return [0, 1, 2, 3, 4].map(i => addDays(weekStartDate, i));
+    return [0, 1, 2, 3, 4].map((i) => addDays(weekStartDate, i));
 }
 
 export function getWeekDayAbbr(dateStr: string): string {
@@ -58,11 +58,7 @@ export function getWeekDayAbbr(dateStr: string): string {
  * Checks if an ISO date "YYYY-MM-DD" falls within a Date range (inclusive).
  * Start/end Dates are normalized to midnight for day-level comparison.
  */
-export function isDateInRange(
-    dateStr: string,
-    start: Date | null,
-    end: Date | null,
-): boolean {
+export function isDateInRange(dateStr: string, start: Date | null, end: Date | null): boolean {
     if (!start || !end) return false;
     const [y, m, d] = dateStr.split('-').map(Number);
     const target = new Date(y, m - 1, d).getTime();

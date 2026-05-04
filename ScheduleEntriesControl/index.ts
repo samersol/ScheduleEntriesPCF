@@ -84,7 +84,7 @@ export class SchedulePlannerV6 implements ComponentFramework.ReactControl<IInput
                     color: '#6B7280',
                 },
             },
-            'Daten werden geladen\u2026',
+            'Daten werden geladen\u2026'
         );
     }
 

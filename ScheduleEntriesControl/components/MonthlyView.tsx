@@ -24,13 +24,13 @@ function calculateMonthlyActualHours(
     employeeId: string,
     scheduleEntries: ScheduleEntry[],
     year: number,
-    month: number,
+    month: number
 ): number {
     const monthStart = new Date(year, month - 1, 1);
     const monthEnd = new Date(year, month, 1); // exclusive
 
     return scheduleEntries
-        .filter(entry => {
+        .filter((entry) => {
             if (entry.employeeId !== employeeId) return false;
             if (!entry.dateFrom) return false;
             return entry.dateFrom >= monthStart && entry.dateFrom < monthEnd;
@@ -42,7 +42,7 @@ function calculateMonthlyTargetHours(
     employee: Employee,
     employeeAbsences: AbsenceEntry[],
     year: number,
-    month: number,
+    month: number
 ): number {
     const dailyHours = (employee.weeklyHours || 0) / 5;
     const daysInMonth = getDaysInMonth(year, month);
@@ -58,7 +58,7 @@ function calculateMonthlyTargetHours(
         if (isHoliday(dateStr)) continue;
         workDays++;
 
-        const isAbsent = employeeAbsences.some(a => isDateInRange(dateStr, a.dateStart, a.dateEnd));
+        const isAbsent = employeeAbsences.some((a) => isDateInRange(dateStr, a.dateStart, a.dateEnd));
         if (isAbsent) absenceDays++;
     }
 
@@ -111,8 +111,8 @@ export const MonthlyView: React.FC<MonthlyViewProps> = ({
     // Calculate totals for Gesamt row
     let totalActual = 0;
     let totalTarget = 0;
-    const empData = employees.map(emp => {
-        const empAbsences = absences.filter(a => a.employeeId === emp.employeeId);
+    const empData = employees.map((emp) => {
+        const empAbsences = absences.filter((a) => a.employeeId === emp.employeeId);
         const actual = calculateMonthlyActualHours(emp.employeeId, scheduleEntries, year, month);
         const target = calculateMonthlyTargetHours(emp, empAbsences, year, month);
         totalActual += actual;
@@ -123,13 +123,11 @@ export const MonthlyView: React.FC<MonthlyViewProps> = ({
 
     const getEntriesForDay = (employeeId: string, dateStr: string): ScheduleEntry[] =>
         scheduleEntries.filter(
-            e => e.employeeId === employeeId && e.dateFrom !== null && formatDateISO(e.dateFrom) === dateStr
+            (e) => e.employeeId === employeeId && e.dateFrom !== null && formatDateISO(e.dateFrom) === dateStr
         );
 
     const getAbsencesForDay = (employeeId: string, dateStr: string): AbsenceEntry[] =>
-        absences.filter(
-            a => a.employeeId === employeeId && isDateInRange(dateStr, a.dateStart, a.dateEnd)
-        );
+        absences.filter((a) => a.employeeId === employeeId && isDateInRange(dateStr, a.dateStart, a.dateEnd));
 
     const getDayTotalHours = (employeeId: string, dateStr: string): number => {
         const entries = getEntriesForDay(employeeId, dateStr);
@@ -138,15 +136,25 @@ export const MonthlyView: React.FC<MonthlyViewProps> = ({
 
     const formatHours = (h: number): string => {
         if (h === 0) return '';
-        return h % 1 === 0 ? `${h}` : h.toFixed(1);
+        return h % 1 === 0 ? `${h}` : h.toFixed(2);
     };
 
     const monthNames = [
-        'Januar', 'Februar', 'M\u00E4rz', 'April', 'Mai', 'Juni',
-        'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember',
+        'Januar',
+        'Februar',
+        'M\u00E4rz',
+        'April',
+        'Mai',
+        'Juni',
+        'Juli',
+        'August',
+        'September',
+        'Oktober',
+        'November',
+        'Dezember',
     ];
 
-    const roundH = (n: number): string => (n % 1 === 0 ? `${n}` : n.toFixed(1));
+    const roundH = (n: number): string => (n % 1 === 0 ? `${n}` : n.toFixed(2));
 
     return (
         <div
@@ -195,12 +203,52 @@ export const MonthlyView: React.FC<MonthlyViewProps> = ({
                         }}
                     >
                         {/* ===== Header row ===== */}
-                        <div style={{ ...headerCellStyle, ...stickyLeft(0), textAlign: 'left', paddingLeft: '12px', fontWeight: 600, color: '#6B7280', zIndex: 4 }}>
+                        <div
+                            style={{
+                                ...headerCellStyle,
+                                ...stickyLeft(0),
+                                textAlign: 'left',
+                                paddingLeft: '12px',
+                                fontWeight: 600,
+                                color: '#6B7280',
+                                zIndex: 4,
+                            }}
+                        >
                             Mitarbeiter
                         </div>
-                        <div style={{ ...headerCellStyle, ...stickyLeft(140), fontWeight: 600, color: '#6B7280', zIndex: 4 }}>Soll</div>
-                        <div style={{ ...headerCellStyle, ...stickyLeft(200), fontWeight: 600, color: '#6B7280', zIndex: 4 }}>Ist</div>
-                        <div style={{ ...headerCellStyle, ...stickyLeft(260), fontWeight: 600, color: '#6B7280', zIndex: 4 }}>Diff</div>
+                        <div
+                            style={{
+                                ...headerCellStyle,
+                                ...stickyLeft(140),
+                                fontWeight: 600,
+                                color: '#6B7280',
+                                zIndex: 4,
+                            }}
+                        >
+                            Soll
+                        </div>
+                        <div
+                            style={{
+                                ...headerCellStyle,
+                                ...stickyLeft(200),
+                                fontWeight: 600,
+                                color: '#6B7280',
+                                zIndex: 4,
+                            }}
+                        >
+                            Ist
+                        </div>
+                        <div
+                            style={{
+                                ...headerCellStyle,
+                                ...stickyLeft(260),
+                                fontWeight: 600,
+                                color: '#6B7280',
+                                zIndex: 4,
+                            }}
+                        >
+                            Diff
+                        </div>
 
                         {Array.from({ length: daysInMonth }, (_, i) => {
                             const day = i + 1;
@@ -254,24 +302,22 @@ export const MonthlyView: React.FC<MonthlyViewProps> = ({
                                         <span style={{ fontWeight: 600, fontSize: '12px', color: '#1F2937' }}>
                                             {emp.employeeName}
                                         </span>
-                                        <span style={{ fontSize: '11px', color: '#9CA3AF' }}>
-                                            {emp.employeeNumber}
-                                        </span>
+                                        <span style={{ fontSize: '11px', color: '#9CA3AF' }}>{emp.employeeNumber}</span>
                                     </div>
 
                                     {/* Soll */}
                                     <div style={{ ...summaryCellBase, ...stickyLeft(140) }}>
-                                        {target > 0 ? `${roundH(target)}h` : '\u2013'}
+                                        {target > 0 ? `${roundH(target)} h` : '\u2013'}
                                     </div>
 
                                     {/* Ist */}
                                     <div style={{ ...summaryCellBase, ...stickyLeft(200), fontWeight: 600 }}>
-                                        {actual > 0 ? `${roundH(actual)}h` : '\u2013'}
+                                        {actual > 0 ? `${roundH(actual)} h` : '\u2013'}
                                     </div>
 
                                     {/* Diff */}
                                     <div style={{ ...summaryCellBase, ...stickyLeft(260), color: diffColor }}>
-                                        {diff === 0 ? '\u2013' : `${diff > 0 ? '+' : ''}${roundH(diff)}h`}
+                                        {diff === 0 ? '\u2013' : `${diff > 0 ? '+' : ''}${roundH(diff)} h`}
                                     </div>
 
                                     {/* Day cells */}
@@ -305,11 +351,13 @@ export const MonthlyView: React.FC<MonthlyViewProps> = ({
                                                 }}
                                             >
                                                 {dayHours > 0 && (
-                                                    <span style={{ fontSize: '12px', color: '#1F2937', fontWeight: 500 }}>
+                                                    <span
+                                                        style={{ fontSize: '12px', color: '#1F2937', fontWeight: 500 }}
+                                                    >
                                                         {formatHours(dayHours)}
                                                     </span>
                                                 )}
-                                                {dayAbsences.map(abs => {
+                                                {dayAbsences.map((abs) => {
                                                     const cfg = getAbsenceConfig(abs.absenceType);
                                                     return (
                                                         <span

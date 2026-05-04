@@ -101,9 +101,7 @@ export const WeeklyView: React.FC<WeeklyViewProps> = ({
                 position: 'relative',
             }}
         >
-            {copyState.active && (
-                <CopyBanner copyState={copyState} onCancel={onCancelCopy} />
-            )}
+            {copyState.active && <CopyBanner copyState={copyState} onCancel={onCancelCopy} />}
 
             {pasteWarning && (
                 <div
@@ -160,7 +158,7 @@ export const WeeklyView: React.FC<WeeklyViewProps> = ({
                             Mitarbeiter
                         </div>
 
-                        {weekDays.map(date => {
+                        {weekDays.map((date) => {
                             const holiday = isHoliday(date);
                             return (
                                 <div
@@ -219,7 +217,7 @@ export const WeeklyView: React.FC<WeeklyViewProps> = ({
                             Keine Mitarbeiter gefunden.
                         </div>
                     ) : (
-                        employees.map(employee => (
+                        employees.map((employee) => (
                             <EmployeeRow
                                 key={employee.employeeId}
                                 employee={employee}

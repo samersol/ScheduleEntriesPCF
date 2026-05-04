@@ -2,13 +2,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { Employee, ScheduleEntry, AbsenceEntry } from '../types';
 import { DayCell } from './DayCell';
-import {
-    isDateInRange,
-    formatBirthdayDE,
-    calculateAge,
-    formatDateISO,
-    isoStringToDate,
-} from '../utils/dateUtils';
+import { isDateInRange, formatBirthdayDE, calculateAge, formatDateISO, isoStringToDate } from '../utils/dateUtils';
 import { isHoliday } from '../utils/holidays';
 
 interface EmployeeRowProps {
@@ -31,7 +25,7 @@ function isTrainingValid(trainingExpiryDate: Date | null): boolean {
     const expiry = new Date(
         trainingExpiryDate.getFullYear(),
         trainingExpiryDate.getMonth(),
-        trainingExpiryDate.getDate(),
+        trainingExpiryDate.getDate()
     );
     return expiry.getTime() >= today.getTime();
 }
@@ -54,7 +48,7 @@ function isBirthdayThisWeek(dateOfBirth: Date | null, weekStartISO: string): boo
 function calculateWeeklyTargetHours(
     employee: Employee,
     employeeAbsences: AbsenceEntry[],
-    weekStartISO: string,
+    weekStartISO: string
 ): number {
     const dailyHours = (employee.weeklyHours || 0) / 5;
     const monday = isoStringToDate(weekStartISO);
@@ -70,7 +64,7 @@ function calculateWeeklyTargetHours(
         if (isHoliday(dateStr)) continue;
         workDays++;
 
-        const isAbsent = employeeAbsences.some(a => isDateInRange(dateStr, a.dateStart, a.dateEnd));
+        const isAbsent = employeeAbsences.some((a) => isDateInRange(dateStr, a.dateStart, a.dateEnd));
         if (isAbsent) absenceDays++;
     }
 
@@ -103,7 +97,7 @@ const BirthdayCakeIcon: React.FC = () => (
 );
 
 function formatHours(n: number): string {
-    return n % 1 === 0 ? `${n}` : n.toFixed(1);
+    return n % 1 === 0 ? `${n} h` : `${Math.floor(n)} h ${(n % 1) * 60} min`;
 }
 
 export const EmployeeRow: React.FC<EmployeeRowProps> = ({
@@ -124,12 +118,12 @@ export const EmployeeRow: React.FC<EmployeeRowProps> = ({
     const weekStart = isoStringToDate(weekStartDate);
     const weekEnd = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + 5);
 
-    const entriesForEmployee = allEntries.filter(e => e.employeeId === employee.employeeId);
-    const absencesForEmployee = allAbsences.filter(a => a.employeeId === employee.employeeId);
+    const entriesForEmployee = allEntries.filter((e) => e.employeeId === employee.employeeId);
+    const absencesForEmployee = allAbsences.filter((a) => a.employeeId === employee.employeeId);
 
     // Ist: sum of durations in the visible week
     const actualNum = entriesForEmployee
-        .filter(e => {
+        .filter((e) => {
             if (!e.dateFrom) return false;
             return e.dateFrom >= weekStart && e.dateFrom < weekEnd;
         })
@@ -147,11 +141,11 @@ export const EmployeeRow: React.FC<EmployeeRowProps> = ({
 
     const getEntriesForDay = (dateStr: string): ScheduleEntry[] =>
         entriesForEmployee
-            .filter(e => e.dateFrom && formatDateISO(e.dateFrom) === dateStr)
+            .filter((e) => e.dateFrom && formatDateISO(e.dateFrom) === dateStr)
             .sort((a, b) => (a.dateFrom?.getTime() ?? 0) - (b.dateFrom?.getTime() ?? 0));
 
     const getAbsencesForDay = (dateStr: string): AbsenceEntry[] =>
-        absencesForEmployee.filter(a => isDateInRange(dateStr, a.dateStart, a.dateEnd));
+        absencesForEmployee.filter((a) => isDateInRange(dateStr, a.dateStart, a.dateEnd));
 
     const employeeNote = employee.note?.trim();
     const customersLine = employee.customers?.trim();
@@ -187,7 +181,12 @@ export const EmployeeRow: React.FC<EmployeeRowProps> = ({
                         </span>
                         {showBirthday && (
                             <span
-                                style={{ position: 'relative', cursor: 'default', display: 'inline-flex', alignItems: 'center' }}
+                                style={{
+                                    position: 'relative',
+                                    cursor: 'default',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                }}
                                 onMouseEnter={() => setTooltipVisible(true)}
                                 onMouseLeave={() => setTooltipVisible(false)}
                             >
@@ -218,9 +217,7 @@ export const EmployeeRow: React.FC<EmployeeRowProps> = ({
                             </span>
                         )}
                     </div>
-                    <span style={{ fontSize: '12px', color: '#9CA3AF' }}>
-                        {employee.employeeNumber}
-                    </span>
+                    <span style={{ fontSize: '12px', color: '#9CA3AF' }}>{employee.employeeNumber}</span>
                     {employeeNote && (
                         <span
                             style={{
@@ -282,7 +279,7 @@ export const EmployeeRow: React.FC<EmployeeRowProps> = ({
                     boxSizing: 'border-box',
                 }}
             >
-                {formatHours(actualNum)}h
+                {formatHours(actualNum)}
             </div>
 
             {/* Soll cell */}
@@ -300,7 +297,7 @@ export const EmployeeRow: React.FC<EmployeeRowProps> = ({
                     boxSizing: 'border-box',
                 }}
             >
-                {formatHours(targetNum)}h
+                {formatHours(targetNum)}
             </div>
         </React.Fragment>
     );
