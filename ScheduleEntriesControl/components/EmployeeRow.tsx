@@ -34,7 +34,7 @@ function isBirthdayThisWeek(dateOfBirth: Date | null, weekStartISO: string): boo
     if (!dateOfBirth || !weekStartISO) return false;
 
     const monday = isoStringToDate(weekStartISO);
-    const friday = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + 4);
+    const friday = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + 6);
 
     const month = dateOfBirth.getMonth();
     const day = dateOfBirth.getDate();
@@ -62,7 +62,7 @@ export const EmployeeRow: React.FC<EmployeeRowProps> = ({
 }) => {
     // Week range as Dates (Mon 00:00 to Sat 00:00 exclusive)
     const weekStart = isoStringToDate(weekStartDate);
-    const weekEnd = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + 5);
+    const weekEnd = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + 7);
 
     const entriesForEmployee = allEntries.filter((e) => e.employeeId === employee.employeeId);
     const absencesForEmployee = allAbsences.filter((a) => a.employeeId === employee.employeeId);
@@ -76,7 +76,7 @@ export const EmployeeRow: React.FC<EmployeeRowProps> = ({
         .reduce((sum, e) => sum + (e.duration || 0), 0);
 
     // Soll: dynamic with holidays + absences deducted
-    const targetNum = calculateNetWorkMinutes(employee, absencesForEmployee, weekStartDate, addDays(weekStartDate, 4));
+    const targetNum = calculateNetWorkMinutes(employee, absencesForEmployee, weekStartDate, addDays(weekStartDate, 6));
 
     const sollColor = actualNum !== targetNum ? '#DC2626' : '#6B7280';
 

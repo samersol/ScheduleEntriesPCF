@@ -4,6 +4,7 @@ import { ScheduleEntry, AbsenceEntry } from '../types';
 import { ScheduleCard } from './ScheduleCard';
 import { AbsenceTag } from './AbsenceTag';
 import { isHoliday } from '../utils/holidays';
+import { isoStringToDate } from '../utils/dateUtils';
 import { CopyIconSvg, PasteIconSvg } from './icons';
 
 interface DayCellProps {
@@ -53,9 +54,13 @@ export const DayCell: React.FC<DayCellProps> = ({
         onCopy(employeeId, date, entries);
     };
 
+    const dow = isoStringToDate(date).getDay();
+    const isWeekendDay = !holiday && (dow === 0 || dow === 6);
     let cellBg = 'transparent';
     if (holiday) {
         cellBg = '#E0F2FE';
+    } else if (isWeekendDay) {
+        cellBg = '#F3F4F6';
     } else if (hovered && !copyModeActive) {
         cellBg = hasScheduleEntries ? '#F5F7F0' : '#F9FAFB';
     }

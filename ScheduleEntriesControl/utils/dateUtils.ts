@@ -41,7 +41,7 @@ export function formatDateDE(dateStr: string): string {
 }
 
 export function getWeekDays(weekStartDate: string): string[] {
-    return [0, 1, 2, 3, 4].map((i) => addDays(weekStartDate, i));
+    return [0, 1, 2, 3, 4, 5, 6].map((i) => addDays(weekStartDate, i));
 }
 
 export function getWeekDayAbbr(dateStr: string): string {

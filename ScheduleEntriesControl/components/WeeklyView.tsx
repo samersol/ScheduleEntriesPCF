@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Employee, ScheduleEntry, AbsenceEntry, CopyState } from '../types';
-import { getWeekDays, getWeekDayAbbr, formatDateDE } from '../utils/dateUtils';
+import { getWeekDays, getWeekDayAbbr, formatDateDE, isoStringToDate } from '../utils/dateUtils';
 import { isHoliday, getHolidayName } from '../utils/holidays';
 import { CopyBanner } from './CopyBanner';
 import { EmployeeRow } from './EmployeeRow';
@@ -109,9 +109,9 @@ export const WeeklyView: React.FC<WeeklyViewProps> = ({
                 <div
                     style={{
                         display: 'grid',
-                        gridTemplateColumns: '180px repeat(5, 1fr) 70px 70px',
+                        gridTemplateColumns: '180px repeat(7, 1fr) 70px 70px',
                         width: '100%',
-                        minWidth: '900px',
+                        minWidth: '1100px',
                     }}
                 >
                     {/* Header row — sticky */}
@@ -132,12 +132,14 @@ export const WeeklyView: React.FC<WeeklyViewProps> = ({
 
                         {weekDays.map((date) => {
                             const holiday = isHoliday(date);
+                            const dow = isoStringToDate(date).getDay();
+                            const weekend = !holiday && (dow === 0 || dow === 6);
                             return (
                                 <div
                                     key={date}
                                     style={{
                                         ...headerCellBase,
-                                        background: holiday ? '#E0F2FE' : '#FFFFFF',
+                                        background: holiday ? '#E0F2FE' : weekend ? '#F3F4F6' : '#FFFFFF',
                                     }}
                                 >
                                     <div style={{ fontWeight: 600, fontSize: '14px', color: '#1F2937' }}>
