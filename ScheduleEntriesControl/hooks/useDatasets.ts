@@ -1,4 +1,5 @@
-import { Employee, ScheduleEntry, AbsenceEntry, AbsenceType } from '../types';
+import { Employee, ScheduleEntry, AbsenceEntry } from '../types';
+import { isAbsenceType } from '../utils/absenceColors';
 
 function getVal(
     record: ComponentFramework.PropertyHelper.DataSetApi.EntityRecord,
@@ -255,7 +256,7 @@ export function parseAbsences(dataset: ComponentFramework.PropertyTypes.DataSet)
         result.push({
             absenceEntryId: parseGuid(getVal(r, COL.absenceEntryId)) || id,
             employeeId: parseGuid(rawEmployeeId),
-            absenceType: (getVal(r, COL.absenceType) as AbsenceType) || 'SO',
+            absenceType: (rawType => isAbsenceType(rawType) ? rawType : 'SO')(getVal(r, COL.absenceType)),
             dateStart,
             dateEnd: getDateValue(r, COL.dateEnd),
         });

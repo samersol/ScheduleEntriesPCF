@@ -6,13 +6,16 @@ interface ScheduleCardProps {
     entry: ScheduleEntry;
 }
 
+function formatDuration(minutes: number): string {
+    return minutes % 60 === 0
+        ? `${minutes / 60} h`
+        : `${Math.floor(minutes / 60)} h ${minutes % 60} min`;
+}
+
 export const ScheduleCard: React.FC<ScheduleCardProps> = ({ entry }) => {
     const startTime = formatTime(entry.dateFrom);
     const endTime = formatTime(entry.dateTo);
-    const durationStr =
-        entry.duration % 60 === 0
-            ? `${entry.duration / 60}\u00A0h`
-            : ` ${Math.floor(entry.duration / 60)}\u00A0h\u00A0${entry.duration % 60}\u00A0min`;
+    const durationStr = formatDuration(entry.duration);
     const timeStr = `${startTime}\u2013${endTime} \u00B7 ${durationStr}`;
 
     const customerLine = entry.customerName || entry.costCenterName;

@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { useState } from 'react';
 import { Employee, ScheduleEntry, AbsenceEntry, CopyState } from '../types';
 import { getWeekDays, getWeekDayAbbr, formatDateDE } from '../utils/dateUtils';
 import { isHoliday, getHolidayName } from '../utils/holidays';
 import { CopyBanner } from './CopyBanner';
 import { EmployeeRow } from './EmployeeRow';
+import { HoverTooltip } from './HoverTooltip';
 
 interface WeeklyViewProps {
     weekStartDate: string;
@@ -23,40 +23,12 @@ interface WeeklyViewProps {
 }
 
 const HolidayTooltip: React.FC<{ date: string }> = ({ date }) => {
-    const [visible, setVisible] = useState(false);
     const name = getHolidayName(date);
     if (!name) return null;
-
     return (
-        <span
-            style={{ position: 'relative', cursor: 'default' }}
-            onMouseEnter={() => setVisible(true)}
-            onMouseLeave={() => setVisible(false)}
-        >
-            <span style={{ fontSize: '11px', color: '#0369A1' }}>{name}</span>
-            {visible && (
-                <span
-                    style={{
-                        position: 'absolute',
-                        bottom: 'calc(100% + 4px)',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        background: '#FFFFFF',
-                        border: '1px solid #E5E7EB',
-                        borderRadius: '6px',
-                        padding: '4px 10px',
-                        fontSize: '12px',
-                        color: '#1F2937',
-                        whiteSpace: 'nowrap',
-                        boxShadow: '0 2px 6px rgba(0,0,0,0.08)',
-                        zIndex: 10,
-                        pointerEvents: 'none',
-                    }}
-                >
-                    {name}
-                </span>
-            )}
-        </span>
+        <HoverTooltip trigger={<span style={{ fontSize: '11px', color: '#0369A1' }}>{name}</span>}>
+            {name}
+        </HoverTooltip>
     );
 };
 

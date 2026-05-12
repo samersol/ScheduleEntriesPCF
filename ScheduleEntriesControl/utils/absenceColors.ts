@@ -16,6 +16,12 @@ export const absenceColors: Record<AbsenceType, AbsenceConfig> = {
     SO: { bg: '#F3F4F6', text: '#374151', label: 'Sonstiges',      shortLabel: 'SO' },
 };
 
+const VALID_ABSENCE_TYPES: readonly AbsenceType[] = ['U', 'K', 'UF', 'KK', 'SU', 'SO'];
+
+export function isAbsenceType(value: unknown): value is AbsenceType {
+    return typeof value === 'string' && (VALID_ABSENCE_TYPES as string[]).includes(value);
+}
+
 export function getAbsenceConfig(type: string): AbsenceConfig {
     return absenceColors[type as AbsenceType] ?? absenceColors.SO;
 }

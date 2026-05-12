@@ -1,3 +1,6 @@
+import { Employee, ScheduleEntry, AbsenceEntry } from '../types';
+import { isHoliday } from './holidays';
+
 /**
  * Normalizes a date string to ISO format YYYY-MM-DD.
  * Accepts both "YYYY-MM-DD" and German "DD.MM.YYYY" formats.
@@ -108,4 +111,105 @@ export function getDayAbbrFromDate(year: number, month: number, day: number): st
     const dow = getDayOfWeek(year, month, day);
     const abbrs = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
     return abbrs[dow];
+}
+
+/** Minutes → "X h" or "X.XX h" for summary cells */
+export function formatMinutesToHours(minutes: number): string {
+    return minutes % 60 === 0
+        ? `${minutes / 60} h`
+        : `${(minutes / 60).toFixed(2)} h`;
+}
+
+/** Minutes → bare numeric string (no suffix) for sign-prefixed or unit-less cells */
+export function formatMinutesToHoursNumeric(minutes: number): string {
+    return minutes % 60 === 0
+        ? `${minutes / 60}`
+        : (minutes / 60).toFixed(2);
+}
+
+export function filterEntriesForDay(entries: ScheduleEntry[], dateStr: string): ScheduleEntry[] {
+    return entries
+        .filter(e => e.dateFrom !== null && formatDateISO(e.dateFrom) === dateStr)
+        .sort((a, b) => (a.dateFrom?.getTime() ?? 0) - (b.dateFrom?.getTime() ?? 0));
+}
+
+export function filterAbsencesForDay(absences: AbsenceEntry[], dateStr: string): AbsenceEntry[] {
+    return absences.filter(a => isDateInRange(dateStr, a.dateStart, a.dateEnd));
+}
+
+export function calculateNetWorkMinutes(
+    employee: Employee,
+    employeeAbsences: AbsenceEntry[],
+    startDateStr: string,
+    endDateStr: string,
+): number {
+    const dailyMinutes = ((employee.weeklyHours || 0) / 5) * 60;
+    const start = isoStringToDate(startDateStr);
+    const end = isoStringToDate(endDateStr);
+    let workDays = 0;
+    let absenceDays = 0;
+    const current = new Date(start);
+    while (current <= end) {
+        const dateStr = formatDateISO(current);
+        const dow = current.getDay();
+        if (dow !== 0 && dow !== 6 && !isHoliday(dateStr)) {
+            workDays++;
+            if (employeeAbsences.some(a => isDateInRange(dateStr, a.dateStart, a.dateEnd)))
+                absenceDays++;
+        }
+        current.setDate(current.getDate() + 1);
+    }
+    return (workDays - absenceDays) * dailyMinutes;
+}
+
+export function getCurrentMonday(): string {
+    const today = new Date();
+    const day = today.getDay();
+    const diff = day === 0 ? -6 : 1 - day;
+    const monday = new Date(today.getFullYear(), today.getMonth(), today.getDate() + diff);
+    return `${monday.getFullYear()}-${String(monday.getMonth() + 1).padStart(2, '0')}-${String(monday.getDate()).padStart(2, '0')}`;
+}
+
+export function isValidISODate(dateStr: string): boolean {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return false;
+    const d = new Date(dateStr + 'T00:00:00');
+    return !isNaN(d.getTime());
+}
+
+function toMinutes(date: Date | null): number | null {
+    if (!date) return null;
+    return date.getHours() * 60 + date.getMinutes();
+}
+
+export function hasPasteOverlap(
+    scheduleEntries: ScheduleEntry[],
+    copiedRecordIds: string[],
+    targetEmployeeId: string,
+    targetDate: string,
+): boolean {
+    if (copiedRecordIds.length === 0) return false;
+
+    const copiedEntries = scheduleEntries.filter(entry => copiedRecordIds.includes(entry.scheduleEntryId));
+    const targetEntries = scheduleEntries.filter(
+        entry =>
+            entry.employeeId === targetEmployeeId &&
+            entry.dateFrom &&
+            formatDateISO(entry.dateFrom) === targetDate,
+    );
+
+    return copiedEntries.some(copiedEntry => {
+        const copiedStart = toMinutes(copiedEntry.dateFrom);
+        const copiedEnd = toMinutes(copiedEntry.dateTo);
+
+        if (copiedStart === null || copiedEnd === null) return false;
+
+        return targetEntries.some(targetEntry => {
+            const targetStart = toMinutes(targetEntry.dateFrom);
+            const targetEnd = toMinutes(targetEntry.dateTo);
+
+            if (targetStart === null || targetEnd === null) return false;
+
+            return copiedStart < targetEnd && targetStart < copiedEnd;
+        });
+    });
 }

@@ -5,8 +5,11 @@ import {
     isWeekend,
     getMonthDateStr,
     getDayAbbrFromDate,
-    isDateInRange,
-    formatDateISO,
+    calculateNetWorkMinutes,
+    filterEntriesForDay,
+    filterAbsencesForDay,
+    formatMinutesToHours,
+    formatMinutesToHoursNumeric,
 } from '../utils/dateUtils';
 import { getAbsenceConfig } from '../utils/absenceColors';
 import { isHoliday, getHolidayName } from '../utils/holidays';
@@ -38,32 +41,6 @@ function calculateMonthlyActualHours(
         .reduce((sum, entry) => sum + (entry.duration || 0), 0);
 }
 
-function calculateMonthlyTargetHours(
-    employee: Employee,
-    employeeAbsences: AbsenceEntry[],
-    year: number,
-    month: number
-): number {
-    const dailyHours = (employee.weeklyHours || 0) / 5;
-    const daysInMonth = getDaysInMonth(year, month);
-
-    let workDays = 0;
-    let absenceDays = 0;
-
-    for (let d = 1; d <= daysInMonth; d++) {
-        const date = new Date(year, month - 1, d);
-        const dateStr = formatDateISO(date);
-        const dow = date.getDay();
-        if (dow === 0 || dow === 6) continue;
-        if (isHoliday(dateStr)) continue;
-        workDays++;
-
-        const isAbsent = employeeAbsences.some((a) => isDateInRange(dateStr, a.dateStart, a.dateEnd));
-        if (isAbsent) absenceDays++;
-    }
-
-    return (workDays - absenceDays) * dailyHours;
-}
 
 export const MonthlyView: React.FC<MonthlyViewProps> = ({
     weekStartDate,
@@ -113,26 +90,14 @@ export const MonthlyView: React.FC<MonthlyViewProps> = ({
     let totalTarget = 0;
     const empData = employees.map((emp) => {
         const empAbsences = absences.filter((a) => a.employeeId === emp.employeeId);
+        const empEntries = scheduleEntries.filter((e) => e.employeeId === emp.employeeId);
         const actual = calculateMonthlyActualHours(emp.employeeId, scheduleEntries, year, month);
-        const target = calculateMonthlyTargetHours(emp, empAbsences, year, month);
+        const target = calculateNetWorkMinutes(emp, empAbsences, getMonthDateStr(year, month, 1), getMonthDateStr(year, month, daysInMonth));
         totalActual += actual;
         totalTarget += target;
-        return { emp, actual, target, empAbsences };
+        return { emp, actual, target, empAbsences, empEntries };
     });
-    const totalDiff = totalActual - totalTarget * 60;
-
-    const getEntriesForDay = (employeeId: string, dateStr: string): ScheduleEntry[] =>
-        scheduleEntries.filter(
-            (e) => e.employeeId === employeeId && e.dateFrom !== null && formatDateISO(e.dateFrom) === dateStr
-        );
-
-    const getAbsencesForDay = (employeeId: string, dateStr: string): AbsenceEntry[] =>
-        absences.filter((a) => a.employeeId === employeeId && isDateInRange(dateStr, a.dateStart, a.dateEnd));
-
-    const getDayTotalHours = (employeeId: string, dateStr: string): number => {
-        const entries = getEntriesForDay(employeeId, dateStr);
-        return entries.reduce((sum, e) => sum + (e.duration || 0), 0);
-    };
+    const totalDiff = totalActual - totalTarget;
 
     const monthNames = [
         'Januar',
@@ -148,8 +113,6 @@ export const MonthlyView: React.FC<MonthlyViewProps> = ({
         'November',
         'Dezember',
     ];
-
-    const roundH = (n: number): string => (n % 60 === 0 ? `${n / 60}` : (n / 60).toFixed(2));
 
     return (
         <div
@@ -274,8 +237,8 @@ export const MonthlyView: React.FC<MonthlyViewProps> = ({
                         })}
 
                         {/* ===== Employee rows ===== */}
-                        {empData.map(({ emp, actual, target }) => {
-                            const diff = actual - target * 60;
+                        {empData.map(({ emp, actual, target, empAbsences, empEntries }) => {
+                            const diff = actual - target;
                             const diffColor = diff < 0 ? '#DC2626' : diff > 0 ? '#16A34A' : '#6B7280';
 
                             return (
@@ -302,17 +265,17 @@ export const MonthlyView: React.FC<MonthlyViewProps> = ({
 
                                     {/* Soll */}
                                     <div style={{ ...summaryCellBase, ...stickyLeft(140) }}>
-                                        {target * 60 > 0 ? `${roundH(target * 60)}\u00A0h` : '\u2013'}
+                                        {target > 0 ? formatMinutesToHours(target) : '\u2013'}
                                     </div>
 
                                     {/* Ist */}
                                     <div style={{ ...summaryCellBase, ...stickyLeft(210), fontWeight: 600 }}>
-                                        {actual > 0 ? `${roundH(actual)}\u00A0h` : '\u2013'}
+                                        {actual > 0 ? formatMinutesToHours(actual) : '\u2013'}
                                     </div>
 
                                     {/* Diff */}
                                     <div style={{ ...summaryCellBase, ...stickyLeft(280), color: diffColor }}>
-                                        {diff === 0 ? '\u2013' : `${diff > 0 ? '+' : ''}${roundH(diff)}\u00A0h`}
+                                        {diff === 0 ? '\u2013' : `${diff > 0 ? '+' : ''}${formatMinutesToHoursNumeric(diff)}\u00A0h`}
                                     </div>
 
                                     {/* Day cells */}
@@ -321,8 +284,9 @@ export const MonthlyView: React.FC<MonthlyViewProps> = ({
                                         const dateStr = getMonthDateStr(year, month, day);
                                         const weekend = isWeekend(year, month, day);
                                         const holiday = isHoliday(dateStr);
-                                        const dayHours = getDayTotalHours(emp.employeeId, dateStr);
-                                        const dayAbsences = getAbsencesForDay(emp.employeeId, dateStr);
+                                        const dayEntries = filterEntriesForDay(empEntries, dateStr);
+                                        const dayHours = dayEntries.reduce((sum, e) => sum + (e.duration || 0), 0);
+                                        const dayAbsences = filterAbsencesForDay(empAbsences, dateStr);
 
                                         let bg = 'transparent';
                                         if (holiday) bg = '#E0F2FE';
@@ -349,7 +313,7 @@ export const MonthlyView: React.FC<MonthlyViewProps> = ({
                                                     <span
                                                         style={{ fontSize: '12px', color: '#1F2937', fontWeight: 500 }}
                                                     >
-                                                        {roundH(dayHours)}
+                                                        {formatMinutesToHoursNumeric(dayHours)}
                                                     </span>
                                                 )}
                                                 {dayAbsences.map((abs) => {
@@ -409,7 +373,7 @@ export const MonthlyView: React.FC<MonthlyViewProps> = ({
                                         fontWeight: 700,
                                     }}
                                 >
-                                    {totalTarget * 60 > 0 ? `${roundH(totalTarget * 60)}\u00A0h` : '\u2013'}
+                                    {totalTarget > 0 ? formatMinutesToHours(totalTarget) : '\u2013'}
                                 </div>
                                 <div
                                     style={{
@@ -419,7 +383,7 @@ export const MonthlyView: React.FC<MonthlyViewProps> = ({
                                         fontWeight: 700,
                                     }}
                                 >
-                                    {totalActual > 0 ? `${roundH(totalActual)}\u00A0h` : '\u2013'}
+                                    {totalActual > 0 ? formatMinutesToHours(totalActual) : '\u2013'}
                                 </div>
                                 <div
                                     style={{
@@ -432,7 +396,7 @@ export const MonthlyView: React.FC<MonthlyViewProps> = ({
                                 >
                                     {totalDiff === 0
                                         ? '\u2013'
-                                        : `${totalDiff > 0 ? '+' : ''}${roundH(totalDiff)}\u00A0h`}
+                                        : `${totalDiff > 0 ? '+' : ''}${formatMinutesToHoursNumeric(totalDiff)} h`}
                                 </div>
                                 {Array.from({ length: daysInMonth }, (_, i) => (
                                     <div

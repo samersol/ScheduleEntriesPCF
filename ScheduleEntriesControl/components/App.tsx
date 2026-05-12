@@ -4,7 +4,7 @@ import { IInputs, IOutputs } from '../generated/ManifestTypes';
 import { parseEmployees, parseScheduleEntries, parseAbsences } from '../hooks/useDatasets';
 import { useCopyPaste } from '../hooks/useCopyPaste';
 import { ScheduleEntry } from '../types';
-import { formatDateISO, normalizeDateToISO } from '../utils/dateUtils';
+import { normalizeDateToISO, getCurrentMonday, isValidISODate, hasPasteOverlap } from '../utils/dateUtils';
 import { WeeklyView } from './WeeklyView';
 import { MonthlyView } from './MonthlyView';
 
@@ -15,61 +15,6 @@ export interface IAppProps {
     height?: number;
 }
 
-function getCurrentMonday(): string {
-    const today = new Date();
-    const day = today.getDay();
-    const diff = day === 0 ? -6 : 1 - day;
-    const monday = new Date(today.getFullYear(), today.getMonth(), today.getDate() + diff);
-    return `${monday.getFullYear()}-${String(monday.getMonth() + 1).padStart(2, '0')}-${String(monday.getDate()).padStart(2, '0')}`;
-}
-
-function isValidISODate(dateStr: string): boolean {
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return false;
-    const d = new Date(dateStr + 'T00:00:00');
-    return !isNaN(d.getTime());
-}
-
-function toMinutes(date: Date | null): number | null {
-    if (!date) return null;
-    return date.getHours() * 60 + date.getMinutes();
-}
-
-function hasPasteOverlap(
-    scheduleEntries: ScheduleEntry[],
-    copiedRecordIds: string[],
-    targetEmployeeId: string,
-    targetDate: string,
-): boolean {
-    if (copiedRecordIds.length === 0) return false;
-
-    const copiedEntries = scheduleEntries.filter(entry => copiedRecordIds.includes(entry.scheduleEntryId));
-    const targetEntries = scheduleEntries.filter(
-        entry =>
-            entry.employeeId === targetEmployeeId &&
-            entry.dateFrom &&
-            formatDateISO(entry.dateFrom) === targetDate,
-    );
-
-    return copiedEntries.some(copiedEntry => {
-        const copiedStart = toMinutes(copiedEntry.dateFrom);
-        const copiedEnd = toMinutes(copiedEntry.dateTo);
-
-        if (copiedStart === null || copiedEnd === null) {
-            return false;
-        }
-
-        return targetEntries.some(targetEntry => {
-            const targetStart = toMinutes(targetEntry.dateFrom);
-            const targetEnd = toMinutes(targetEntry.dateTo);
-
-            if (targetStart === null || targetEnd === null) {
-                return false;
-            }
-
-            return copiedStart < targetEnd && targetStart < copiedEnd;
-        });
-    });
-}
 
 export const App: React.FC<IAppProps> = ({ context, onOutputChanged, width, height }) => {
     const { copyState, startCopy, cancelCopy } = useCopyPaste();
