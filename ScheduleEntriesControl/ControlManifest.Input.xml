@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <manifest>
-  <control namespace="pur" constructor="SchedulePlannerV6" version="0.0.4" display-name-key="Schedule Planner V7" description-key="Weekly/Monthly schedule planner" control-type="virtual">
+  <control namespace="pur" constructor="SchedulePlannerV6" version="0.0.10" display-name-key="Schedule Planner V7" description-key="Weekly/Monthly schedule planner" control-type="virtual">
     <external-service-usage enabled="false">
     </external-service-usage>
 

@@ -68,7 +68,7 @@ function calculateWeeklyTargetHours(
         if (isAbsent) absenceDays++;
     }
 
-    return (workDays - absenceDays) * dailyHours;
+    return (workDays - absenceDays) * dailyHours * 60;
 }
 
 const BirthdayCakeIcon: React.FC = () => (
@@ -97,7 +97,7 @@ const BirthdayCakeIcon: React.FC = () => (
 );
 
 function formatHours(n: number): string {
-    return n % 1 === 0 ? `${n} h` : `${Math.floor(n)} h ${(n % 1) * 60} min`;
+    return n % 60 === 0 ? `${n / 60}\u00A0h` : `${(n / 60).toFixed(2)}\u00A0h`;
 }
 
 export const EmployeeRow: React.FC<EmployeeRowProps> = ({

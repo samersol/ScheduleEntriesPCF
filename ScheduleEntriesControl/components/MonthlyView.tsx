@@ -119,7 +119,7 @@ export const MonthlyView: React.FC<MonthlyViewProps> = ({
         totalTarget += target;
         return { emp, actual, target, empAbsences };
     });
-    const totalDiff = totalActual - totalTarget;
+    const totalDiff = totalActual - totalTarget * 60;
 
     const getEntriesForDay = (employeeId: string, dateStr: string): ScheduleEntry[] =>
         scheduleEntries.filter(
@@ -132,11 +132,6 @@ export const MonthlyView: React.FC<MonthlyViewProps> = ({
     const getDayTotalHours = (employeeId: string, dateStr: string): number => {
         const entries = getEntriesForDay(employeeId, dateStr);
         return entries.reduce((sum, e) => sum + (e.duration || 0), 0);
-    };
-
-    const formatHours = (h: number): string => {
-        if (h === 0) return '';
-        return h % 1 === 0 ? `${h}` : h.toFixed(2);
     };
 
     const monthNames = [
@@ -154,7 +149,7 @@ export const MonthlyView: React.FC<MonthlyViewProps> = ({
         'Dezember',
     ];
 
-    const roundH = (n: number): string => (n % 1 === 0 ? `${n}` : n.toFixed(2));
+    const roundH = (n: number): string => (n % 60 === 0 ? `${n / 60}` : (n / 60).toFixed(2));
 
     return (
         <div
@@ -197,7 +192,7 @@ export const MonthlyView: React.FC<MonthlyViewProps> = ({
                     <div
                         style={{
                             display: 'grid',
-                            gridTemplateColumns: `140px 60px 50px 60px repeat(${daysInMonth}, minmax(36px, 1fr))`,
+                            gridTemplateColumns: `140px 70px 70px 70px repeat(${daysInMonth}, minmax(36px, 1fr))`,
                             width: 'max-content',
                             minWidth: '100%',
                         }}
@@ -230,7 +225,7 @@ export const MonthlyView: React.FC<MonthlyViewProps> = ({
                         <div
                             style={{
                                 ...headerCellStyle,
-                                ...stickyLeft(200),
+                                ...stickyLeft(210),
                                 fontWeight: 600,
                                 color: '#6B7280',
                                 zIndex: 4,
@@ -241,7 +236,7 @@ export const MonthlyView: React.FC<MonthlyViewProps> = ({
                         <div
                             style={{
                                 ...headerCellStyle,
-                                ...stickyLeft(260),
+                                ...stickyLeft(280),
                                 fontWeight: 600,
                                 color: '#6B7280',
                                 zIndex: 4,
@@ -280,7 +275,7 @@ export const MonthlyView: React.FC<MonthlyViewProps> = ({
 
                         {/* ===== Employee rows ===== */}
                         {empData.map(({ emp, actual, target }) => {
-                            const diff = actual - target;
+                            const diff = actual - target * 60;
                             const diffColor = diff < 0 ? '#DC2626' : diff > 0 ? '#16A34A' : '#6B7280';
 
                             return (
@@ -307,17 +302,17 @@ export const MonthlyView: React.FC<MonthlyViewProps> = ({
 
                                     {/* Soll */}
                                     <div style={{ ...summaryCellBase, ...stickyLeft(140) }}>
-                                        {target > 0 ? `${roundH(target)} h` : '\u2013'}
+                                        {target * 60 > 0 ? `${roundH(target * 60)}\u00A0h` : '\u2013'}
                                     </div>
 
                                     {/* Ist */}
-                                    <div style={{ ...summaryCellBase, ...stickyLeft(200), fontWeight: 600 }}>
-                                        {actual > 0 ? `${roundH(actual)} h` : '\u2013'}
+                                    <div style={{ ...summaryCellBase, ...stickyLeft(210), fontWeight: 600 }}>
+                                        {actual > 0 ? `${roundH(actual)}\u00A0h` : '\u2013'}
                                     </div>
 
                                     {/* Diff */}
-                                    <div style={{ ...summaryCellBase, ...stickyLeft(260), color: diffColor }}>
-                                        {diff === 0 ? '\u2013' : `${diff > 0 ? '+' : ''}${roundH(diff)} h`}
+                                    <div style={{ ...summaryCellBase, ...stickyLeft(280), color: diffColor }}>
+                                        {diff === 0 ? '\u2013' : `${diff > 0 ? '+' : ''}${roundH(diff)}\u00A0h`}
                                     </div>
 
                                     {/* Day cells */}
@@ -354,7 +349,7 @@ export const MonthlyView: React.FC<MonthlyViewProps> = ({
                                                     <span
                                                         style={{ fontSize: '12px', color: '#1F2937', fontWeight: 500 }}
                                                     >
-                                                        {formatHours(dayHours)}
+                                                        {roundH(dayHours)}
                                                     </span>
                                                 )}
                                                 {dayAbsences.map((abs) => {
@@ -414,28 +409,30 @@ export const MonthlyView: React.FC<MonthlyViewProps> = ({
                                         fontWeight: 700,
                                     }}
                                 >
-                                    {totalTarget > 0 ? `${roundH(totalTarget)}h` : '\u2013'}
+                                    {totalTarget * 60 > 0 ? `${roundH(totalTarget * 60)}\u00A0h` : '\u2013'}
                                 </div>
                                 <div
                                     style={{
                                         ...summaryCellBase,
-                                        ...stickyLeft(200),
+                                        ...stickyLeft(210),
                                         background: '#FAFAFA',
                                         fontWeight: 700,
                                     }}
                                 >
-                                    {totalActual > 0 ? `${roundH(totalActual)}h` : '\u2013'}
+                                    {totalActual > 0 ? `${roundH(totalActual)}\u00A0h` : '\u2013'}
                                 </div>
                                 <div
                                     style={{
                                         ...summaryCellBase,
-                                        ...stickyLeft(260),
+                                        ...stickyLeft(280),
                                         background: '#FAFAFA',
                                         fontWeight: 700,
                                         color: totalDiff < 0 ? '#DC2626' : totalDiff > 0 ? '#16A34A' : '#6B7280',
                                     }}
                                 >
-                                    {totalDiff === 0 ? '\u2013' : `${totalDiff > 0 ? '+' : ''}${roundH(totalDiff)}h`}
+                                    {totalDiff === 0
+                                        ? '\u2013'
+                                        : `${totalDiff > 0 ? '+' : ''}${roundH(totalDiff)}\u00A0h`}
                                 </div>
                                 {Array.from({ length: daysInMonth }, (_, i) => (
                                     <div

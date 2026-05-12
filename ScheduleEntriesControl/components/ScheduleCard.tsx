@@ -10,9 +10,9 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({ entry }) => {
     const startTime = formatTime(entry.dateFrom);
     const endTime = formatTime(entry.dateTo);
     const durationStr =
-        entry.duration % 1 === 0
-            ? `${entry.duration}h`
-            : ` ${Math.floor(entry.duration)} h ${(entry.duration % 1) * 60} min`;
+        entry.duration % 60 === 0
+            ? `${entry.duration / 60}\u00A0h`
+            : ` ${Math.floor(entry.duration / 60)}\u00A0h\u00A0${entry.duration % 60}\u00A0min`;
     const timeStr = `${startTime}\u2013${endTime} \u00B7 ${durationStr}`;
 
     const customerLine = entry.customerName || entry.costCenterName;
