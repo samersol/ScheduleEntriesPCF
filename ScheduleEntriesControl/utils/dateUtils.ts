@@ -32,12 +32,6 @@ export function isoStringToDate(dateStr: string): Date {
     return new Date(y, m - 1, d);
 }
 
-/** Returns YYYY-MM-DD for a Date, or "" if null. */
-export function dateToISO(date: Date | null): string {
-    if (!date) return '';
-    return formatDateISO(date);
-}
-
 export function formatDateDE(dateStr: string): string {
     const parts = dateStr.split('-');
     return `${parts[2]}.${parts[1]}.`;

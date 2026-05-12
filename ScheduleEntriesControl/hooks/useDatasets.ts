@@ -170,7 +170,6 @@ const COL = {
     costCenterName:      'pur_fxcostcentername',
     dateFrom:            'pur_dtedatefrom',
     dateTo:              'pur_dtedateto',
-    pause:               'pur_intpause',
     duration:            'pur_fxduration',
     note:                'pur_strnote',
     // Absence
@@ -204,10 +203,7 @@ export function parseEmployees(dataset: ComponentFramework.PropertyTypes.DataSet
             note: getVal(r, COL.employeeNote),
             customers: getVal(r, COL.customers),
             weeklyHours,
-            actualHours: 0,
-            targetHours: weeklyHours,
             trainingExpiryDate: getDateValue(r, COL.trainingExpiryDate),
-            hasBirthdayThisWeek: false,
             dateOfBirth: getDateValue(r, COL.dateOfBirth),
         });
     }
@@ -236,7 +232,6 @@ export function parseScheduleEntries(dataset: ComponentFramework.PropertyTypes.D
             costCenterName: getVal(r, COL.costCenterName),
             dateFrom,
             dateTo: getDateValue(r, COL.dateTo),
-            pause: getNumberValue(r, COL.pause),
             duration: getNumberValue(r, COL.duration),
             note: getVal(r, COL.note),
         });

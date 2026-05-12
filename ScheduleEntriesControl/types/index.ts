@@ -5,10 +5,7 @@ export interface Employee {
     note: string;
     customers: string;
     weeklyHours: number;
-    actualHours: number;
-    targetHours: number;
     trainingExpiryDate: Date | null;
-    hasBirthdayThisWeek: boolean;
     dateOfBirth: Date | null;
 }
 
@@ -21,7 +18,6 @@ export interface ScheduleEntry {
     costCenterName: string;
     dateFrom: Date | null;
     dateTo: Date | null;
-    pause: number;
     duration: number;
     note: string;
 }
@@ -44,11 +40,3 @@ export interface CopyState {
     recordIds: string[];
 }
 
-export interface OutputValues {
-    selectedAction?: string;
-    selectedEmployeeId?: string;
-    selectedDate?: string;
-    copiedRecordIds?: string;
-    pasteTargetEmployeeId?: string;
-    pasteTargetDate?: string;
-}
