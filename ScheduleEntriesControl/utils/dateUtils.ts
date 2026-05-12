@@ -113,35 +113,31 @@ export function getDayAbbrFromDate(year: number, month: number, day: number): st
     return abbrs[dow];
 }
 
-/** Minutes → "X h" or "X.XX h" for summary cells */
+/** Minutes → "X h" or "X.XX h" for summary cells */
 export function formatMinutesToHours(minutes: number): string {
-    return minutes % 60 === 0
-        ? `${minutes / 60} h`
-        : `${(minutes / 60).toFixed(2)} h`;
+    return minutes % 60 === 0 ? `${minutes / 60}\u00A0h` : `${(minutes / 60).toFixed(2)}\u00A0h`;
 }
 
 /** Minutes → bare numeric string (no suffix) for sign-prefixed or unit-less cells */
 export function formatMinutesToHoursNumeric(minutes: number): string {
-    return minutes % 60 === 0
-        ? `${minutes / 60}`
-        : (minutes / 60).toFixed(2);
+    return minutes % 60 === 0 ? `${minutes / 60}` : (minutes / 60).toFixed(2);
 }
 
 export function filterEntriesForDay(entries: ScheduleEntry[], dateStr: string): ScheduleEntry[] {
     return entries
-        .filter(e => e.dateFrom !== null && formatDateISO(e.dateFrom) === dateStr)
+        .filter((e) => e.dateFrom !== null && formatDateISO(e.dateFrom) === dateStr)
         .sort((a, b) => (a.dateFrom?.getTime() ?? 0) - (b.dateFrom?.getTime() ?? 0));
 }
 
 export function filterAbsencesForDay(absences: AbsenceEntry[], dateStr: string): AbsenceEntry[] {
-    return absences.filter(a => isDateInRange(dateStr, a.dateStart, a.dateEnd));
+    return absences.filter((a) => isDateInRange(dateStr, a.dateStart, a.dateEnd));
 }
 
 export function calculateNetWorkMinutes(
     employee: Employee,
     employeeAbsences: AbsenceEntry[],
     startDateStr: string,
-    endDateStr: string,
+    endDateStr: string
 ): number {
     const dailyMinutes = ((employee.weeklyHours || 0) / 5) * 60;
     const start = isoStringToDate(startDateStr);
@@ -154,8 +150,7 @@ export function calculateNetWorkMinutes(
         const dow = current.getDay();
         if (dow !== 0 && dow !== 6 && !isHoliday(dateStr)) {
             workDays++;
-            if (employeeAbsences.some(a => isDateInRange(dateStr, a.dateStart, a.dateEnd)))
-                absenceDays++;
+            if (employeeAbsences.some((a) => isDateInRange(dateStr, a.dateStart, a.dateEnd))) absenceDays++;
         }
         current.setDate(current.getDate() + 1);
     }
@@ -185,25 +180,23 @@ export function hasPasteOverlap(
     scheduleEntries: ScheduleEntry[],
     copiedRecordIds: string[],
     targetEmployeeId: string,
-    targetDate: string,
+    targetDate: string
 ): boolean {
     if (copiedRecordIds.length === 0) return false;
 
-    const copiedEntries = scheduleEntries.filter(entry => copiedRecordIds.includes(entry.scheduleEntryId));
+    const copiedEntries = scheduleEntries.filter((entry) => copiedRecordIds.includes(entry.scheduleEntryId));
     const targetEntries = scheduleEntries.filter(
-        entry =>
-            entry.employeeId === targetEmployeeId &&
-            entry.dateFrom &&
-            formatDateISO(entry.dateFrom) === targetDate,
+        (entry) =>
+            entry.employeeId === targetEmployeeId && entry.dateFrom && formatDateISO(entry.dateFrom) === targetDate
     );
 
-    return copiedEntries.some(copiedEntry => {
+    return copiedEntries.some((copiedEntry) => {
         const copiedStart = toMinutes(copiedEntry.dateFrom);
         const copiedEnd = toMinutes(copiedEntry.dateTo);
 
         if (copiedStart === null || copiedEnd === null) return false;
 
-        return targetEntries.some(targetEntry => {
+        return targetEntries.some((targetEntry) => {
             const targetStart = toMinutes(targetEntry.dateFrom);
             const targetEnd = toMinutes(targetEntry.dateTo);
 
