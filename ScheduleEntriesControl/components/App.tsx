@@ -50,10 +50,10 @@ export const App: React.FC<IAppProps> = ({ context, onOutputChanged, width, heig
         });
     };
 
-    const handleCopy = (employeeId: string, date: string, entries: ScheduleEntry[]) => {
+    const handleCopy = (employeeId: string, date: string, entry: ScheduleEntry) => {
         const employee = employees.find(e => e.employeeId === employeeId);
         const employeeName = employee ? employee.employeeName : '';
-        const recordIds = entries.map(e => e.scheduleEntryId);
+        const recordIds = [entry.scheduleEntryId];
 
         startCopy(employeeId, employeeName, date, recordIds);
 

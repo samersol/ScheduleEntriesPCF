@@ -8,9 +8,6 @@ interface CopyBannerProps {
 }
 
 export const CopyBanner: React.FC<CopyBannerProps> = ({ copyState, onCancel }) => {
-    const count = copyState.recordIds.length;
-    const plural = count === 1 ? 'Dienst' : 'Dienste';
-
     return (
         <div
             style={{
@@ -31,7 +28,7 @@ export const CopyBanner: React.FC<CopyBannerProps> = ({ copyState, onCancel }) =
                 <span style={{ color: '#1F2937' }}>
                     Einsatz kopiert von{' '}
                     <strong>{copyState.employeeName}</strong>
-                    {' '}({count} {plural}) &rarr; Zelle anklicken zum Einf&uuml;gen
+                    {' '}&rarr; Zelle anklicken zum Einf&uuml;gen
                 </span>
             </div>
             <div

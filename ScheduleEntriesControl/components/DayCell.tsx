@@ -5,7 +5,7 @@ import { ScheduleCard } from './ScheduleCard';
 import { AbsenceTag } from './AbsenceTag';
 import { isHoliday } from '../utils/holidays';
 import { isoStringToDate } from '../utils/dateUtils';
-import { CopyIconSvg, PasteIconSvg } from './icons';
+import { PasteIconSvg } from './icons';
 
 interface DayCellProps {
     employeeId: string;
@@ -16,7 +16,7 @@ interface DayCellProps {
     hasRightBorder: boolean;
     onEmpty: (employeeId: string, date: string) => void;
     onFilled: (employeeId: string, date: string) => void;
-    onCopy: (employeeId: string, date: string, entries: ScheduleEntry[]) => void;
+    onCopy: (employeeId: string, date: string, entry: ScheduleEntry) => void;
     onPaste: (employeeId: string, date: string) => void;
 }
 
@@ -47,11 +47,6 @@ export const DayCell: React.FC<DayCellProps> = ({
             // Empty cell or absence-only cell -> click_empty
             onEmpty(employeeId, date);
         }
-    };
-
-    const handleCopy = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        onCopy(employeeId, date, entries);
     };
 
     const dow = isoStringToDate(date).getDay();
@@ -86,31 +81,6 @@ export const DayCell: React.FC<DayCellProps> = ({
             onMouseLeave={() => setHovered(false)}
             onClick={handleCellClick}
         >
-            {/* Copy button — top-right of CELL, only on hover when entries exist */}
-            {hasScheduleEntries && hovered && !copyModeActive && (
-                <button
-                    style={{
-                        position: 'absolute',
-                        top: '6px',
-                        right: '6px',
-                        width: '28px',
-                        height: '28px',
-                        borderRadius: '4px',
-                        background: '#E5E7EB',
-                        border: 'none',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'pointer',
-                        zIndex: 2,
-                        padding: 0,
-                    }}
-                    onClick={handleCopy}
-                >
-                    <CopyIconSvg />
-                </button>
-            )}
-
             {/* Absence tags */}
             {absences.map(abs => (
                 <AbsenceTag key={abs.absenceEntryId} type={abs.absenceType} />
@@ -118,7 +88,11 @@ export const DayCell: React.FC<DayCellProps> = ({
 
             {/* Schedule cards */}
             {entries.map(entry => (
-                <ScheduleCard key={entry.scheduleEntryId} entry={entry} />
+                <ScheduleCard
+                    key={entry.scheduleEntryId}
+                    entry={entry}
+                    onCopy={() => onCopy(employeeId, date, entry)}
+                />
             ))}
 
             {/* Paste target — only on hover during copy mode, for cells without schedule entries */}

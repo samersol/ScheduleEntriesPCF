@@ -1,9 +1,12 @@
 import * as React from 'react';
+import { useState } from 'react';
 import { ScheduleEntry } from '../types';
 import { formatTime } from '../utils/dateUtils';
+import { CopyIconSvg } from './icons';
 
 interface ScheduleCardProps {
     entry: ScheduleEntry;
+    onCopy: () => void;
 }
 
 function formatDuration(minutes: number): string {
@@ -12,7 +15,9 @@ function formatDuration(minutes: number): string {
         : `${Math.floor(minutes / 60)} h ${minutes % 60} min`;
 }
 
-export const ScheduleCard: React.FC<ScheduleCardProps> = ({ entry }) => {
+export const ScheduleCard: React.FC<ScheduleCardProps> = ({ entry, onCopy }) => {
+    const [hovered, setHovered] = useState(false);
+
     const startTime = formatTime(entry.dateFrom);
     const endTime = formatTime(entry.dateTo);
     const durationStr = formatDuration(entry.duration);
@@ -26,6 +31,7 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({ entry }) => {
     return (
         <div
             style={{
+                position: 'relative',
                 background: '#F0F4E4',
                 borderLeft: '3px solid #6B8E23',
                 borderRadius: '0 4px 4px 0',
@@ -35,7 +41,32 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({ entry }) => {
                 flexDirection: 'column',
                 gap: '2px',
             }}
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
         >
+            {hovered && (
+                <button
+                    style={{
+                        position: 'absolute',
+                        top: '4px',
+                        right: '4px',
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '4px',
+                        background: '#E5E7EB',
+                        border: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        zIndex: 2,
+                        padding: 0,
+                    }}
+                    onClick={(e) => { e.stopPropagation(); onCopy(); }}
+                >
+                    <CopyIconSvg />
+                </button>
+            )}
             <div
                 style={{
                     fontSize: '13px',

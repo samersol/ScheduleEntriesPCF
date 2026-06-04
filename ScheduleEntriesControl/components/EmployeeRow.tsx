@@ -14,7 +14,7 @@ interface EmployeeRowProps {
     copyModeActive: boolean;
     onEmpty: (employeeId: string, date: string) => void;
     onFilled: (employeeId: string, date: string) => void;
-    onCopy: (employeeId: string, date: string, entries: ScheduleEntry[]) => void;
+    onCopy: (employeeId: string, date: string, entry: ScheduleEntry) => void;
     onPaste: (employeeId: string, date: string) => void;
 }
 

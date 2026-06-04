@@ -15,7 +15,7 @@ interface WeeklyViewProps {
     onCancelCopy: () => void;
     onEmpty: (employeeId: string, date: string) => void;
     onFilled: (employeeId: string, date: string) => void;
-    onCopy: (employeeId: string, date: string, entries: ScheduleEntry[]) => void;
+    onCopy: (employeeId: string, date: string, entry: ScheduleEntry) => void;
     onPaste: (employeeId: string, date: string) => void;
     pasteWarning: string;
     width?: number;
